@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser, User
 from django.conf import settings
 
 class BearerTokenAuthentication(TokenAuthentication):
-    keyword = u"Bearer"  
+    keyword = u"Bearer"
 
 
 class CuentasZistemo(models.Model):
