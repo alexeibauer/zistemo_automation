@@ -44,7 +44,7 @@ class CatalogoProyectosView(generics.GenericAPIView):
 
         proyectos = ReportesZistemoBL().listar_proyectos()
         proyectos_creados = 0
-        if "success" in proyectos and proyectos["success"]=="true":
+        if "success" in proyectos and proyectos["success"]:
             for proyecto in proyectos["data"]:
                 p = Proyectos.objects.filter(project_name=proyecto["project_name"], number=proyecto["number"]).first()
 
