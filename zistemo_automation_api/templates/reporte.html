@@ -1,0 +1,100 @@
+<html>
+    <body>
+        <h2 style="color: black">Timesheet Details</h2>
+        <h3 style="color: black">Groupe Up</h3>
+        <br/>
+        <br/>
+        <table style="width: 100%;">
+            <tr>
+                <td>
+                    <h5 style="color: black">{{user_name}}</h5>
+                </td>
+                <td>&nbsp;</td>
+                <td style="text-align: right;">
+                    <h5 style="color: black">
+                        From {{initial_date}} to {{end_date}}
+                    </h5>
+                </td>
+            </tr>
+        </table>
+        
+        <table>
+            <THEAD>
+                <tr>
+                    <th bgcolor="#dadada" width="8%">DATE</th>
+                    <th bgcolor="#dadada" width="8%">CLIENT</th>
+                    <th bgcolor="#dadada" width="14%">PROJECT</th>
+                    <th bgcolor="#dadada" width="24%">TASK</th>
+                    <th bgcolor="#dadada" width="30%">NOTES</th>
+                    <th bgcolor="#dadada" width="8%">HOURS</th>
+                    <th bgcolor="#dadada" width="8%">BILLED</th>
+                </tr>
+            </THEAD>
+            <TBODY>
+                <tr>
+                    <td>{{te_log_date_formatted}}</td>
+                    <td>{{te_customer_name}}</td>
+                    <td>
+                        {{pr_project_name}}-{{te_projectName}}
+                    </td>
+                    <td>
+                        <p style="padding: 5px">
+                            {{te_taskName}}
+                        </p>
+                    </td>
+                    <td>
+                        {{te_notes}}
+                    </td>
+                    <td align="center">
+                        {{te_hours}}
+                    </td>
+                    <td align="center">
+                        {{te_billed}}
+                    </td>
+                </tr>
+            </TBODY>
+            <TFOOT>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="right"><h4 color="black">Total</h4></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td align="center">
+                        <h4 color="black">{{total}}</h4>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="right"><h4 color="black">All Total</h4></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td align="center">
+                        <h4 color="black">{{total}}</h4>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+            </TFOOT>
+        </table>
+    </body>
+</html>
