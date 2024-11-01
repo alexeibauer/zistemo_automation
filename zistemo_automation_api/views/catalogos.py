@@ -44,18 +44,41 @@ class CatalogoProyectosView(generics.GenericAPIView):
 
         proyectos = ReportesZistemoBL().listar_proyectos()
         proyectos_creados = 0
-        if "success" in proyectos and proyectos["success"]:
-            for proyecto in proyectos["data"]:
-                p = Proyectos.objects.filter(project_name=proyecto["project_name"], number=proyecto["number"]).first()
+        for proyecto in proyectos:
+            p = Proyectos.objects.filter(project_name=proyecto["project_name"], number=proyecto["number"]).first()
 
-                if not p:
-                    p = Proyectos.objects.create(
-                                project_name = proyecto["project_name"],
-                                number = proyecto["number"],
-                                customer_name = proyecto["customer_name"],
-                                status = proyecto["status"]
-                                )
-                    p.save()
-                    proyectos_creados = proyectos_creados+1
+            if not p:
+                p = Proyectos.objects.create(
+                            project_id = proyecto["id"],
+                            project_name = proyecto["project_name"],
+                            number = proyecto["number"],
+                            customer_name = proyecto["customer_name"],
+                            status = proyecto["status"]
+                            )
+                p.save()
+                proyectos_creados = proyectos_creados+1
 
         return Response({"proyectos_creados": proyectos_creados})
+    
+class CatalogoUsuariosView(generics.GenericAPIView):
+
+    def post(self, request, *args, **kwargs):
+
+        usuarios = ReportesZistemoBL().listar_usuarios()
+        usuarios_creados = 0
+        for usuario in usuarios:
+            u = UsuariosZistemo.objects.filter(zistemo_id=usuario["id"]).first()
+
+            if not u:
+                u = UsuariosZistemo.objects.create(
+                            zistemo_id = usuario["id"],
+                            first_name = usuario["first_name"],
+                            last_name = usuario["last_name"],
+                            email = usuario["email"],
+                            zistemo_activo = usuario["is_user_active"],
+                            activo = True
+                            )
+                u.save()
+                usuarios_creados = usuarios_creados+1
+
+        return Response({"usuarios_creados": usuarios_creados})

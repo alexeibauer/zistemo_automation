@@ -8,6 +8,8 @@ urlpatterns = [
         path('admin/', admin.site.urls),
     # Construcción de catálogos
         path('catalogos/proyectos', catalogos.CatalogoProyectosView.as_view()),
+        path('catalogos/usuarios', catalogos.CatalogoUsuariosView.as_view()),
     # Reportes
-        path('reporte/', reportes.DescargarReporteView.as_view())
+        path('timesheet/', reportes.TimesheetSaveView.as_view()),
+        path('reporte/', reportes.CrearReporteDiaView.as_view())
 ]

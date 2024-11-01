@@ -1,7 +1,7 @@
 <html>
     <body>
         <h2 style="color: black">Timesheet Details</h2>
-        <h3 style="color: black">Groupe Up</h3>
+        <h3 style="color: black">{{client_name}}</h3>
         <br/>
         <br/>
         <table style="width: 100%;">
@@ -31,27 +31,7 @@
                 </tr>
             </THEAD>
             <TBODY>
-                <tr>
-                    <td>{{te_log_date_formatted}}</td>
-                    <td>{{te_customer_name}}</td>
-                    <td>
-                        {{pr_project_name}}-{{te_projectName}}
-                    </td>
-                    <td>
-                        <p style="padding: 5px">
-                            {{te_taskName}}
-                        </p>
-                    </td>
-                    <td>
-                        {{te_notes}}
-                    </td>
-                    <td align="center">
-                        {{te_hours}}
-                    </td>
-                    <td align="center">
-                        {{te_billed}}
-                    </td>
-                </tr>
+                {{time_entry_rows}}
             </TBODY>
             <TFOOT>
                 <tr>

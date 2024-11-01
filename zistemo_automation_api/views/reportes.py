@@ -1,3 +1,4 @@
+from pathlib import Path
 from django.shortcuts import render
 from django.db.models import *
 from django.db import transaction
@@ -60,14 +61,36 @@ class ZistemoPDF(FPDF, HTMLMixin):
         self.cell(0, 10, self.client_name+" - "+self.get_current_formatted_date(), 0, 0, 'L')
         self.cell(0, 10, 'Page %s' % self.page_no() + ' of {nb}', 0, 0, 'R')
 
-class DescargarReporteView(generics.GenericAPIView):
+class CrearReporteDiaView(generics.GenericAPIView):
 
-    def get(self, request, *args, **kwargs):
+    def formatHours(self, hours):
+        td = timedelta(hours=float(hours))
+        total_seconds = td.total_seconds()
+        hours = total_seconds//3600
+        minutes = (td.seconds // 60) % 60
+        return str(int(hours))+":"+str(minutes).zfill(2)
         
+    def post(self, request, *args, **kwargs):
+        
+        fecha = request.data["fecha"]
+        client_id = request.data["client_id"]
+
+        cuentaZistemo = CuentasZistemo.objects.filter(client_id=client_id).first()
+        if not cuentaZistemo:
+            return Response({},404)
+        
+        timeEntries = TimeEntries.objects.filter(log_date_formatted=fecha).all()
+        if not timeEntries or len(timeEntries)==0:
+            return Response({},404)
+        
+        timeEntry = timeEntries[0]
+        project = Proyectos.objects.filter(project_id=timeEntry.project_id).first()
+        if not project:
+            return Response({}, 404)
 
         # instantiating the class
         pdf = ZistemoPDF()
-        pdf.set_client_name("Groupe Up")
+        pdf.set_client_name(client_id)
         pdf.set_font('Helvetica', size=8)
         # adding a page
         pdf.add_page(orientation='L')
@@ -75,12 +98,87 @@ class DescargarReporteView(generics.GenericAPIView):
         file = open("/Users/alexvaldes/Workspaces/Python/zistemo_automation_api/zistemo_automation_api/templates/reporte.html", "r")
         # extracting the data from hte file as a string
         data = file.read()
+
+        # Replace general data
+
+        data = data.replace("{{client_name}}",client_id)
+        data = data.replace("{{user_name}}",timeEntry.userName)
+        data = data.replace("{{initial_date}}",timeEntry.log_date_formatted)
+        data = data.replace("{{end_date}}",timeEntry.log_date_formatted)
+
+        #Iterate entries to replace data
+        row_file = open("/Users/alexvaldes/Workspaces/Python/zistemo_automation_api/zistemo_automation_api/templates/time_entry_row.html", "r")
+        row_stub = row_file.read()
+        total_hours = 0
+        rows_data = ""
+        for te in timeEntries:
+            total_hours = total_hours + float(te.hours)
+            new_row = row_stub
+            new_row = new_row.replace("{{te_log_date_formatted}}", te.log_date_formatted)
+            new_row = new_row.replace("{{te_customer_name}}", te.customer_name)
+            new_row = new_row.replace("{{pr_number}}", project.number)
+            new_row = new_row.replace("{{te_projectName}}", te.projectName)
+            new_row = new_row.replace("{{te_taskName}}", te.taskName)
+            new_row = new_row.replace("{{te_notes}}", te.notes)
+            new_row = new_row.replace("{{te_hours}}", self.formatHours(te.hours))
+            new_row = new_row.replace("{{te_billed}}", "No" if te.billed=="0" else "Yes")
+
+            rows_data = rows_data + new_row
+
+        data = data.replace("{{time_entry_rows}}",rows_data)
+        data = data.replace("{{total}}",self.formatHours(total_hours))
+
         # HTMLMixin write_html method
         pdf.write_html(data)
-
-
+        date_parts = timeEntry.log_date_formatted.split("/")
+        month = date_parts[1]
+        year = date_parts[2]
+        
+        Path("/Users/alexvaldes/Workspaces/Python/zistemo_automation_api/zistemo_automation_api/templates/reportes_pdf/"+year+"/"+month).mkdir(parents=True, exist_ok=True)
+        fileName = str(client_id).replace(" ","").lower()+"_"+str(timeEntry.userName).replace(" ","").lower()+"_"+timeEntry.log_date_formatted.replace("/","_")
         #saving the file as a pdf
-        pdf.output('/Users/alexvaldes/Workspaces/Python/zistemo_automation_api/zistemo_automation_api/templates/reporte.pdf', 'F')
+        pdf.output('/Users/alexvaldes/Workspaces/Python/zistemo_automation_api/zistemo_automation_api/templates/reportes_pdf/'+year+'/'+month+'/'+fileName+'.pdf', 'F')
         pdf.alias_nb_pages()
 
-        return Response() 
+        return Response({"pdf_creado":True},201) 
+        
+class TimesheetSaveView(generics.GenericAPIView):
+
+    def post (self, request, *args, **kwargs):
+
+        fecha_timesheet = request.data["fecha_timesheet"]
+
+        #Buscamos entradas por cada usuario
+        usuarios = UsuariosZistemo.objects.filter(activo=1).all()
+        zistemoBL = ReportesZistemoBL()
+        time_entries_created = 0
+        for usuario in usuarios:
+            user_id = usuario.zistemo_id
+
+            time_entries = zistemoBL.listar_time_entries(fecha_timesheet,user_id)
+
+            for time_entry in time_entries:
+                te = TimeEntries.objects.filter(zistemo_id=time_entry["id"])
+                if not te:
+                    te = TimeEntries.objects.create(
+                        zistemo_id = time_entry["id"],
+                        user_id = time_entry["user_id"],
+                        project_id = time_entry["project_id"],
+                        hours = time_entry["hours"],
+                        notes = time_entry["notes"],
+                        billed = time_entry["billed"],
+                        hours_rounded = time_entry["hours_rounded"],
+                        projectName = time_entry["projectName"],
+                        taskName = time_entry["taskName"],
+                        userName = time_entry["userName"],
+                        customer_name = time_entry["customer_name"],
+                        log_date_formatted = time_entry["log_date_formatted"]
+                    )
+
+                    te.save()
+                    time_entries_created = time_entries_created+1
+
+
+
+        return Response({"time_entries_created":time_entries_created}, 201)
+    
