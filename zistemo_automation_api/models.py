@@ -55,18 +55,20 @@ class UsuariosZistemo(models.Model):
     
 class TimeEntries(models.Model):
     id = models.BigAutoField(primary_key=True)
-    zistemo_id = models.TextField(null=False, blank=False, max_length=255, default=None)
-    user_id = models.TextField(null=False, blank=False, max_length=255, default=None)
-    project_id = models.TextField(null=False, blank=False, max_length=255, default=None)
+    csv_key = models.TextField(null=True, blank=True, max_length=255, default=None)
+    zistemo_id = models.TextField(null=True, blank=True, max_length=255, default=None)
+    user_id = models.TextField(null=True, blank=True, max_length=255, default=None)
+    project_id = models.TextField(null=True, blank=True, max_length=255, default="")
     hours = models.TextField(null=False, blank=False, max_length=255, default=None)
-    notes = models.TextField(null=False, blank=False, max_length=255, default=None)
-    billed = models.TextField(null=False, blank=False, max_length=255, default=None)
+    notes = models.TextField(null=True, blank=True, max_length=255, default="")
+    billed = models.TextField(null=True, blank=True, max_length=255, default="0")
     hours_rounded = models.TextField(null=False, blank=False, max_length=255, default=None)
     projectName = models.TextField(null=False, blank=False, max_length=255, default=None)
     taskName = models.TextField(null=False, blank=False, max_length=255, default=None)
     userName = models.TextField(null=False, blank=False, max_length=255, default=None)
     customer_name = models.TextField(null=False, blank=False, max_length=255, default=None)
     log_date_formatted = models.TextField(null=False, blank=False, max_length=255, default=None)
+    time_entry_file_name = models.TextField(null=True, blank=True, max_length=255, default=None)
     created_at = models.DateTimeField(null=False, blank=False, auto_now_add=True)
 
     def __str__(self):

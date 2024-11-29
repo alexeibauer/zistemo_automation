@@ -12,6 +12,7 @@ url = "http://127.0.0.1:8000/reporte/"
 date_inicial = datetime.datetime.strptime(fecha_inicial, "%Y-%m-%d")
 date_final =  datetime.datetime.strptime(fecha_final, "%Y-%m-%d")
 dias = 0
+numero_pdfs_creados = 0
 while date_inicial<=date_final:
 
     print("Enviando fecha para PDF:: "+str(date_inicial))
@@ -25,4 +26,8 @@ while date_inicial<=date_final:
     date_inicial = date_inicial + datetime.timedelta(days=1)
     dias = dias + 1
 
-print("Finalizados "+str(dias)+" de procesamiento PDF")
+    if 'numero_pdfs_creados' in res:
+        numero_pdfs_creados = numero_pdfs_creados + res['numero_pdfs_creados']
+        print("PDFs creados hasta ahora:: "+str(numero_pdfs_creados))
+
+print("Finalizados "+str(dias)+" de procesamiento PDF, se crearon un total de "+str(numero_pdfs_creados)+" PDFs")

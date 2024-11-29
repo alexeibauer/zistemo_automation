@@ -4,6 +4,7 @@ import requests
 import datetime
 import random
 import string
+from datetime import timedelta
 
 class DataUtils:
 
@@ -57,8 +58,7 @@ class DataUtils:
             elif ".webm" in file_name:
                 return "video/webm"
         else:
-            return ""
-                
+            return ""            
 
     @staticmethod
     def is_url(text):
@@ -85,3 +85,24 @@ class DataUtils:
             url = absolute_uri.replace(full_path,"")
             
         return url
+
+    @staticmethod
+    def convert_hours_to_float(hours_str):
+
+        hours_arr = hours_str.split(":")
+        hours = hours_arr[0]
+        minutes = hours_arr[1]
+        
+        td = timedelta(hours=float(hours), minutes=float(minutes))
+        total_hours = td.total_seconds() / 3600
+        
+        return total_hours
+    
+    @staticmethod
+    def convert_point_date_to_slash(date_w_points):
+        date_arr = date_w_points.split(".")
+        month = date_arr[0]
+        day = date_arr[1]
+        year = date_arr[2]
+        date_w_slashes =  day+"/"+month+"/"+year
+        return date_w_slashes

@@ -11,5 +11,6 @@ urlpatterns = [
         path('catalogos/usuarios', catalogos.CatalogoUsuariosView.as_view()),
     # Reportes
         path('timesheet/', reportes.TimesheetSaveView.as_view()),
+        path('timesheet/local', reportes.LocalTimesheetSaveView.as_view()),
         path('reporte/', reportes.CrearReporteDiaView.as_view())
 ]
